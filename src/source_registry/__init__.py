@@ -31,6 +31,18 @@ from source_registry.patches import (
     drop_patch,
     load_patches,
 )
+from source_registry.poll import (
+    GhCliClient,
+    PrSnapshot,
+    ReconcileFinding,
+    ReconcileSuggestion,
+    UpstreamApiClient,
+    UpstreamSnapshot,
+    poll_all,
+    poll_source,
+    reconcile,
+)
+from source_registry.push import PushError, PushResult, push_patch
 from source_registry.service import SourceRegistry
 from source_registry.verify import verify_all, verify_source
 
@@ -57,6 +69,18 @@ __all__ = [
     "load_patches",
     "drop_patch",
     "PatchError",
+    "PrSnapshot",
+    "UpstreamSnapshot",
+    "ReconcileFinding",
+    "ReconcileSuggestion",
+    "UpstreamApiClient",
+    "GhCliClient",
+    "poll_source",
+    "poll_all",
+    "reconcile",
+    "PushResult",
+    "PushError",
+    "push_patch",
     "SourceRegistryError",
     "SourceNotFoundError",
     "DuplicateSourceError",
