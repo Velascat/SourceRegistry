@@ -90,14 +90,17 @@ def test_verify_returns_not_ok_for_missing_local_path(tmp_path) -> None:
     assert "does not exist" in result.message
 
 
-def test_verify_python_tool_not_implemented(tmp_path) -> None:
+def test_verify_python_tool_reports_when_not_uv_installed(tmp_path) -> None:
+    """python_tool aliases cli_tool; verify reads direct_url.json from the
+    uv-tool install. When the tool isn't uv-installed we surface that.
+    """
     path = tmp_path / "tool"
     path.mkdir()
     registry = SourceRegistry(
         [
             SourceEntry(
                 name="tool",
-                upstream_url="https://github.com/example/tool",
+                upstream_url="https://github.com/example/some-uninstalled-tool-xyz",
                 local_path=str(path),
                 branch="main",
                 expected_sha="abc123",
@@ -107,4 +110,4 @@ def test_verify_python_tool_not_implemented(tmp_path) -> None:
     )
     result = registry.verify("tool")
     assert result.ok is False
-    assert "not implemented" in result.message
+    assert "not installed" in result.message or "direct_url.json" in result.message
