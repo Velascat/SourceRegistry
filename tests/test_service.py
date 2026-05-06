@@ -111,3 +111,60 @@ def test_verify_python_tool_reports_when_not_uv_installed(tmp_path) -> None:
     result = registry.verify("tool")
     assert result.ok is False
     assert "not installed" in result.message or "direct_url.json" in result.message
+
+
+# ── cli_tool dir_info fallback (dev-mode local install) ────────────────
+
+
+def test_verify_cli_tool_falls_back_to_git_head_when_dir_info(tmp_path, monkeypatch):
+    """When direct_url.json has dir_info (dev-mode local install) and
+    no vcs_info, verify reads HEAD from the install dir directly.
+    """
+    import json
+    import subprocess
+
+    # Build a fake "local install dir" that's a git repo
+    install_dir = tmp_path / "tool-clone"
+    install_dir.mkdir()
+    subprocess.run(["git", "-C", str(install_dir), "init", "-q"], check=True)
+    subprocess.run(["git", "-C", str(install_dir), "config", "user.email", "t@t"], check=True)
+    subprocess.run(["git", "-C", str(install_dir), "config", "user.name", "t"], check=True)
+    (install_dir / "f").write_text("x", encoding="utf-8")
+    subprocess.run(["git", "-C", str(install_dir), "add", "f"], check=True)
+    subprocess.run(["git", "-C", str(install_dir), "commit", "-q", "-m", "init"], check=True)
+    head = subprocess.run(
+        ["git", "-C", str(install_dir), "rev-parse", "HEAD"],
+        capture_output=True, text=True, check=True,
+    ).stdout.strip()
+
+    # Build a fake uv-tool layout that points at install_dir
+    uv_root = tmp_path / "uv-tools"
+    tool_root = uv_root / "tool"
+    site = tool_root / "lib" / "python3.12" / "site-packages"
+    dist = site / "tool-1.0.dist-info"
+    dist.mkdir(parents=True)
+    (dist / "direct_url.json").write_text(
+        json.dumps({"url": f"file://{install_dir}", "dir_info": {}}),
+        encoding="utf-8",
+    )
+
+    # Monkey-patch _uv_tool_dir to point at our fake
+    from source_registry import verify as verify_mod
+    monkeypatch.setattr(verify_mod, "_uv_tool_dir", lambda: uv_root)
+
+    registry = SourceRegistry(
+        [
+            SourceEntry(
+                name="tool",
+                upstream_url="https://github.com/example/tool",
+                local_path=str(install_dir),
+                branch="main",
+                expected_sha=head[:7],
+                install_kind=InstallKind.CLI_TOOL,
+            )
+        ]
+    )
+    result = registry.verify("tool")
+    assert result.ok is True
+    assert result.actual_sha == head
+    assert "git HEAD" in result.message

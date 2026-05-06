@@ -162,6 +162,20 @@ def _verify_cli_tool(entry: SourceEntry) -> VerificationResult:
 
     vcs_info = metadata.get("vcs_info") or {}
     actual_sha = vcs_info.get("commit_id") or vcs_info.get("requested_revision")
+    source_note = "direct_url.json vcs_info"
+
+    # Fallback: dev-mode `uv tool install <local_path>` records dir_info
+    # instead of vcs_info (PEP 610 doesn't carry SHA for local installs).
+    # When that's the source, read HEAD from the install URL's local
+    # clone directly — that's the SHA the install actually came from.
+    if actual_sha is None and "dir_info" in metadata:
+        clone = _resolve_install_dir(metadata, entry)
+        if clone is not None and is_git_repo(str(clone)):
+            try:
+                actual_sha = get_head_sha(str(clone))
+                source_note = f"git HEAD of local install dir ({clone})"
+            except Exception:
+                actual_sha = None
 
     if actual_sha is None:
         return VerificationResult(
@@ -170,7 +184,7 @@ def _verify_cli_tool(entry: SourceEntry) -> VerificationResult:
             expected_sha=entry.expected_sha,
             actual_sha=None,
             local_path=entry.local_path,
-            message="direct_url.json present but vcs_info missing commit_id",
+            message="direct_url.json present but no SHA derivable (no vcs_info, no git HEAD at install dir)",
         )
 
     ok = actual_sha.startswith(entry.expected_sha) or entry.expected_sha.startswith(actual_sha)
@@ -180,5 +194,24 @@ def _verify_cli_tool(entry: SourceEntry) -> VerificationResult:
         expected_sha=entry.expected_sha,
         actual_sha=actual_sha,
         local_path=entry.local_path,
-        message="installed sha matches pin" if ok else "installed sha != pin",
+        message=(
+            f"sha matches pin (via {source_note})" if ok
+            else f"sha {actual_sha[:8]} != pin (via {source_note})"
+        ),
     )
+
+
+def _resolve_install_dir(metadata: dict, entry) -> Optional[Path]:
+    """Extract a filesystem path from direct_url.json's ``url`` field.
+
+    Returns the directory path the dev-mode install came from. Falls
+    back to ``entry.local_path`` when the URL isn't parseable.
+    """
+    url = metadata.get("url", "")
+    if url.startswith("file://"):
+        return Path(url[len("file://"):])
+    if url.startswith("/"):
+        return Path(url)
+    if entry.local_path:
+        return Path(entry.local_path)
+    return None
