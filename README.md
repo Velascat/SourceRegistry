@@ -23,6 +23,24 @@
 - a package manager replacement
 - a fork synchronization daemon (SR records intent; the operator pushes)
 
+## Quick start
+
+```bash
+pip install -e .
+```
+
+Verify a local source against its declared SHA:
+
+```bash
+source-registry --registry registry/source_registry.yaml verify <source_id>
+source-registry --registry registry/source_registry.yaml list
+source-registry --registry registry/source_registry.yaml poll
+```
+
+## Architecture
+
+A YAML registry (`registry/source_registry.yaml`) declares each source dependency: upstream URL, fork URL, local path, expected SHA, `install_kind`, and lifecycle state. Five surfaces sit on top — verification (SHA-based), lifecycle tracking, patch records (`<patches_root>/<source>/PATCH-NNN.yaml`), poll-time reconciliation suggestions, and push-intent descriptors. The CLI (`source-registry verify | list | patches | poll`) is the single entry point. **Install kinds** below maps `install_kind` to its verification basis.
+
 ## Install kinds
 
 | `install_kind` | Verification basis |

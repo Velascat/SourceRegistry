@@ -22,3 +22,5 @@ _Where did you leave off? What should be verified next session?_
 _Free-form scratch. Clear periodically — old entries can be deleted once no longer relevant._
 
 ---
+
+- DC4 README sections (2026-05-08, on `fix/dc4-readme-sections`): Custodian DC4 (native) flagged the README missing both Quick start and Architecture H2s. Quick start gives pip install + source-registry CLI examples; Architecture summarises the YAML-registry-with-five-surfaces shape (verify / lifecycle / patches / poll / push) and points at Install kinds for the verification-basis table.
