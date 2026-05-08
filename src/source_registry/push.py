@@ -44,7 +44,7 @@ class PushResult:
 
 
 def _run(cmd: list[str], cwd: Path | None = None) -> tuple[int, str, str]:
-    proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True)
+    proc = subprocess.run(cmd, cwd=cwd, capture_output=True, text=True, timeout=120)
     return proc.returncode, proc.stdout, proc.stderr
 
 

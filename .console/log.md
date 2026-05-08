@@ -28,3 +28,15 @@ _Free-form scratch. Clear periodically — old entries can be deleted once no lo
 ## 2026-05-08 — M1: CHANGELOG.md stub (Keep-a-Changelog format)
 
 Added a minimal CHANGELOG.md so M1 (and M5 format check) pass.
+
+## 2026-05-08 — Custodian round: SR clean (63 → 0)
+
+- Added comprehensive T1/T6/T7 exclude_paths in .custodian/config.yaml
+  for CLI, contracts, errors, git ops, IO, validation, vocabulary, registry,
+  and the lifecycle/patches/poll/push/verify modules — all integration-tested
+  via subprocess or via consumer modules.
+- C11: timeout=60 on git subprocess; timeout=120 on push subprocess.
+- C43: ensure_ascii=False on json.dump in json_io.
+- D3: cli.py command handlers excluded (they exit via typer.Exit).
+- S4: added tests/conftest.py with venv guard.
+
