@@ -28,6 +28,7 @@ def _git(repo: str | Path, *args: str) -> GitResult:
     proc = subprocess.run(
         ["git", "-C", str(repo), *args],
         capture_output=True, text=True,
+        timeout=60,
     )
     return GitResult(returncode=proc.returncode, stdout=proc.stdout, stderr=proc.stderr)
 

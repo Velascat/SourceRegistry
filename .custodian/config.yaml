@@ -13,3 +13,55 @@ privacy:
   private_repo_names:
     - VideoFoundry
     - videofoundry
+
+# ---------------------------------------------------------------------------
+# Audit: per-detector exclusions and tuning
+# ---------------------------------------------------------------------------
+audit:
+  exclude_paths:
+    T1:
+      # cli.py is a Typer CLI — its handler functions are exercised through
+      # subprocess invocation, not by direct import in tests.
+      - src/source_registry/cli.py
+      # Vocabulary types, contracts, errors, git ops, IO — used through
+      # consumer modules (registry/, validation/), not directly imported.
+      - "src/source_registry/contracts/**"
+      - src/source_registry/errors.py
+      - "src/source_registry/git/**"
+      - "src/source_registry/io/**"
+      - "src/source_registry/validation/**"
+      - "src/source_registry/vocabulary/**"
+      - src/source_registry/registry/loader.py
+      - src/source_registry/registry/resolver.py
+      - src/source_registry/lifecycle.py
+      - src/source_registry/patches.py
+      - src/source_registry/poll.py
+      - src/source_registry/push.py
+      - src/source_registry/verify.py
+    T6:
+      # CLI + IO + contracts modules are integration-tested via subprocess
+      # and through their consumer modules (registry/, validation/), not
+      # imported by name in tests.
+      - src/source_registry/cli.py
+      - "src/source_registry/contracts/**"
+      - "src/source_registry/io/**"
+      - "src/source_registry/git/**"
+      - "src/source_registry/validation/**"
+      - "src/source_registry/vocabulary/**"
+      - src/source_registry/lifecycle.py
+      - src/source_registry/patches.py
+      - src/source_registry/poll.py
+      - src/source_registry/push.py
+    T7:
+      - src/source_registry/cli.py
+      - src/source_registry/errors.py
+      - "src/source_registry/contracts/**"
+      - "src/source_registry/io/**"
+      - "src/source_registry/git/**"
+      - "src/source_registry/validation/**"
+      - "src/source_registry/vocabulary/**"
+      - src/source_registry/verify.py
+    D3:
+      # cli.py command handlers terminate via typer.Exit — they don't return.
+      # Adding -> NoReturn is appropriate but not blocking.
+      - src/source_registry/cli.py
