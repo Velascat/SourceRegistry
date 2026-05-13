@@ -10,9 +10,7 @@ tests_root: tests
 # docs/history/**, tools/audit/report/**, .custodian/config.yaml itself)
 # spare operator-private and historical surfaces.
 privacy:
-  private_repo_names:
-    - VideoFoundry
-    - videofoundry
+  require_boundary_artifact: true
 
 # ---------------------------------------------------------------------------
 # Audit: per-detector exclusions and tuning
