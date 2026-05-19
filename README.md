@@ -16,7 +16,7 @@
 
 - OperationsCenter — orchestration, planning, policy
 - SwitchBoard — lane/backend selection
-- ExecutorRuntime — runtime execution mechanics
+- CoreRunner — runtime execution mechanics
 - CxRP — orchestration contract
 - RxP — runtime contract
 - a scheduler / executor / subprocess runner

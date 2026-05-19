@@ -34,7 +34,7 @@ ruff check src/
 
 SourceRegistry intentionally has a narrow scope: **resolve named source dependencies to local paths and verify expected source state**. Do **not** add:
 
-- Subprocess execution or runner logic (that lives in ExecutorRuntime)
+- Subprocess execution or runner logic (that lives in CoreRunner)
 - Scheduling, queues, or workflow orchestration
 - Routing decisions (that lives in SwitchBoard)
 - Planning or proposal logic (that lives in OperationsCenter)

@@ -11,7 +11,7 @@
 ## Scope Check
 
 - [ ] Change stays within source resolution + verification (or patch records / reconciliation)
-- [ ] No subprocess execution / runner logic introduced (that's ExecutorRuntime)
+- [ ] No subprocess execution / runner logic introduced (that's CoreRunner)
 - [ ] No routing or planning logic introduced
 - [ ] Force-push and PR-creation consent flags still gate destructive actions
 
